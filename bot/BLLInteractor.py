@@ -19,39 +19,39 @@ class BLLInteractor:
         if self.debug:
             return 42
         else:
-            return requests.get(self.api_url, params={'text': text}).json()['response']
+            return requests.get(self.api_url + '/count', params={'text': text}).json()['response']
     
     @catch_error
     def summarize_text(self, text: str) -> str:
         if self.debug:
             return "lorem ipsum"
         else:
-            return requests.get(self.api_url, params={'text': text}).json()['response']
+            return requests.get(self.api_url + '/summarize', params={'text': text}).json()['response']
     
     @catch_error
     def lemmatize_text(self, text: str) -> str:
         if self.debug:
             return "lorem ipsum"
         else:
-            return requests.get(self.api_url, params={'text': text}).json()['response']
+            return requests.get(self.api_url + '/lemmatize', params={'text': text}).json()['response']
     
     @catch_error
     def stemming_text(self, text: str) -> str:
         if self.debug:
             return "lorem ipsum"
         else:
-            return requests.get(self.api_url, params={'text': text}).json()['response']
+            return requests.get(self.api_url + '/stemming', params={'text': text}).json()['response']
     
     @catch_error
     def translate_text(self, lang_from: str, lang_to: str, text: str) -> str:
         if self.debug:
             return "lorem ipsum"
         else:
-            return requests.get(self.api_url, params={'lang_from': lang_from, 'lang_to': lang_to, 'text': text}).json()['response']
+            return requests.get(self.api_url + '/translate', params={'lang_from': lang_from, 'lang_to': lang_to, 'text': text}).json()['response']
     
     @catch_error
     def censure_text(self, text: str) -> str:
         if self.debug:
             return "lorem ipsum"
         else:
-            return requests.get(self.api_url, params={'text': text}).json()['response']
+            return requests.get(self.api_url + '/censure', params={'text': text}).json()['response']
