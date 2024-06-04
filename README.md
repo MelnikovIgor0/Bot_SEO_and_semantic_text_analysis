@@ -20,11 +20,24 @@ pip install requirements.txt
 
 3) Open `bot/config.json` and set token for TG-bot, url of API and DEBUG mode ON/OFF.
 
-... HERE SPECIFY STAGES FOR BLL MICROSERVICE
+4) Run the BLL microservice
 
-4) Run the BLL microservice \<EXPLAIN HOW>
+```sh
+cd bll
+python server.py
+```
 
-5) Run the TG bot:
+5) Run airflow
+
+Change dags directory(dags_folder) in airflow.cfg to bll/dags from this repository
+
+Start airflow
+```sh
+airflow webserver
+airflow scheduler
+```
+  
+6) Run the TG bot:
 
 ```sh
 cd bot
