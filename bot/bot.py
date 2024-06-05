@@ -1,6 +1,9 @@
 import telebot
 from BotConfig import BotConfig, parse_bot_config
 from BLLInteractor import BLLInteractor
+from bll.dugs.summarize import register_summary_handler
+from bll.dugs.lemmatize import register_lemmatize_handler
+from bll.dugs.stemming import register_stemming_handler
 
 config = parse_bot_config('config.json')
 bot = telebot.TeleBot(config.telegram_api_token)
@@ -39,12 +42,6 @@ def send_welcome(message):
     else:
         bot.reply_to(message, api_interactor.count_words(message.text[7:]))
 
-@bot.message_handler(commands=['summary'])
-def send_welcome(message):
-    if len(message.text) < 9:
-        bot.reply_to(message, 'There\'s no text!')
-    else:
-        bot.reply_to(message, api_interactor.summarize_text(message.text[9:]))
 
 @bot.message_handler(commands=['lemmatize'])
 def send_welcome(message):
@@ -77,6 +74,10 @@ def send_welcome(message):
 @bot.message_handler(func=lambda message: True)
 def echo_all(message):
     bot.reply_to(message, "Undefined command!")
+
+register_summary_handler(bot, config.openai_api_key)
+register_lemmatize_handler(bot, config.openai_api_key)
+register_stemming_handler(bot, config.openai_api_key)
 
 if __name__ == '__main__':
     bot.polling()
