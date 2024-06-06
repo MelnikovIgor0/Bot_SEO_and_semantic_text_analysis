@@ -1,23 +1,41 @@
-import openai
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from nltk.stem import PorterStemmer
 
-def generate_stemming(text, openai_api_key):
-    openai.api_key = openai_api_key
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": f"Stem the following text: {text}"}
-        ]
-    )
-    stemmed_text = response['choices'][0]['message']['content']
-    return stemmed_text
-
-def register_stemming_handler(bot, openai_api_key):
-    @bot.message_handler(commands=['stemming'])
-    def stemming_text(message):
-        if len(message.text) < 10:
-            bot.reply_to(message, 'There\'s no text!')
+def process_message(**context):
+    message = context['dag_run'].conf["message"]
+    ps = PorterStemmer()
+    result = ''
+    i = 0
+    while i < len(message):
+        if message[i].isalpha():
+            c = ''
+            while i < len(message) and message[i].isalpha():
+                c += message[i]
+                i += 1
+            result += ps.stem(c)
         else:
-            text_to_stem = message.text[10:]
-            stemmed_text = generate_stemming(text_to_stem, openai_api_key)
-            bot.reply_to(message, stemmed_text)
+            result += message[i]
+            i += 1
+    context['ti'].xcom_push(key='result', value=result)
+
+
+default_args = {
+    'owner': 'airflow',
+    'retries': 1,
+}
+
+dag = DAG(
+    'stemming',
+    default_args=default_args,
+    schedule_interval=None,
+)
+
+process_message_task = PythonOperator(
+    task_id='process_message',
+    python_callable=process_message,
+    provide_context=True,
+    dag=dag,
+)
+
+process_message_task

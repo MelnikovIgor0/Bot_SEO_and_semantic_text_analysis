@@ -1,23 +1,44 @@
-import openai
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from nltk.stem import WordNetLemmatizer
+import nltk
 
-def generate_lemmatization(text, openai_api_key):
-    openai.api_key = openai_api_key
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": f"Lemmatize the following text: {text}"}
-        ]
-    )
-    lemmatized_text = response['choices'][0]['message']['content']
-    return lemmatized_text
 
-def register_lemmatize_handler(bot, openai_api_key):
-    @bot.message_handler(commands=['lemmatize'])
-    def lemmatize_text(message):
-        if len(message.text) < 11:
-            bot.reply_to(message, 'There\'s no text!')
+def process_message(**context):
+    message = context['dag_run'].conf["message"]
+    wnl = WordNetLemmatizer()
+    words = message.split(' ')
+    result = ''
+    i = 0
+    while i < len(message):
+        if message[i].isalpha():
+            c = ''
+            while i < len(message) and message[i].isalpha():
+                c += message[i]
+                i += 1
+            result += wnl.lemmatize(c)
         else:
-            text_to_lemmatize = message.text[11:]
-            lemmatized_text = generate_lemmatization(text_to_lemmatize, openai_api_key)
-            bot.reply_to(message, lemmatized_text)
+            result += message[i]
+            i += 1
+    context['ti'].xcom_push(key='result', value=result)
+
+
+default_args = {
+    'owner': 'airflow',
+    'retries': 1,
+}
+
+dag = DAG(
+    'lemmatize',
+    default_args=default_args,
+    schedule_interval=None,
+)
+
+process_message_task = PythonOperator(
+    task_id='process_message',
+    python_callable=process_message,
+    provide_context=True,
+    dag=dag,
+)
+
+process_message_task

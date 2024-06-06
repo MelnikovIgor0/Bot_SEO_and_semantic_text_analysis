@@ -3,6 +3,7 @@ import urllib
 from flask import Flask, request, jsonify
 import requests
 import time
+import nltk
 
 app = Flask(__name__)
 
@@ -76,4 +77,5 @@ def poll_for_result(dag_id, run_id, poll_interval=10, timeout=300):
 
 
 if __name__ == '__main__':
+    nltk.download('wordnet')
     app.run(host='0.0.0.0', port=8765)
