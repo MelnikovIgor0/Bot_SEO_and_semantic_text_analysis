@@ -5,7 +5,7 @@ def generate_summary(text, openai_api_key):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are a helpful assistant."}, # чего...
+            {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": f"Please summarize the following text: {text}"}
         ]
     )
@@ -18,7 +18,6 @@ def register_summary_handler(bot, openai_api_key):
         if len(message.text) < 9:
             bot.reply_to(message, 'There\'s no text!')
         else:
-            # Extract the text after the command '/summary '
             text_to_summarize = message.text[9:]
             summary = generate_summary(text_to_summarize, openai_api_key)
             bot.reply_to(message, summary)

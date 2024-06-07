@@ -11,7 +11,7 @@ def translate_text(**context):
     lang_to = conf.get('lang_to', 'ru')
 
     chat = GigaChat(
-        credentials='NjlmOTdlNDEtYmRiYi00ZTU2LThmYWMtYTI2MmFhYWU2OWJlOjdjNTQxNWRkLTI4NjItNGY1ZC04YTA4LWYzZDA2ODg1ZjAwZg==',
+        credentials='GIGACHAT_KEY',
         verify_ssl_certs=False)
 
     messages = [SystemMessage(
