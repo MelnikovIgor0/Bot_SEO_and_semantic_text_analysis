@@ -1,7 +1,8 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
-import openai
+from langchain.schema import HumanMessage, SystemMessage
+from langchain_community.chat_models.gigachat import GigaChat
 
 def translate_text(**context):
     conf = context['dag_run'].conf
@@ -9,21 +10,17 @@ def translate_text(**context):
     lang_from = conf.get('lang_from', 'en')
     lang_to = conf.get('lang_to', 'ru')
 
-    OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY'
+    chat = GigaChat(
+        credentials='NjlmOTdlNDEtYmRiYi00ZTU2LThmYWMtYTI2MmFhYWU2OWJlOjdjNTQxNWRkLTI4NjItNGY1ZC04YTA4LWYzZDA2ODg1ZjAwZg==',
+        verify_ssl_certs=False)
 
-    openai.api_key = OPENAI_API_KEY
+    messages = [SystemMessage(
+        content="Ты бот переводчик, выдавать в сообщении ничего кроме переведенного текста не нужно."
+    ), HumanMessage(content=f"Translate from {lang_from} to {lang_to} '{message}'")]
 
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=f"Translate the following text from {lang_from} to {lang_to}:\n\n{message}",
-        max_tokens=1000
-    )
-
-    if response:
-        translation = response.choices[0].text.strip()
-        context['ti'].xcom_push(key='result', value=translation)
-    else:
-        raise ValueError("Translation API error")
+    res = chat(messages)
+    messages.append(res)
+    context['ti'].xcom_push(key='result', value=res.content)
 
 default_args = {
     'owner': 'airflow',

@@ -1,9 +1,9 @@
 import telebot
 from BotConfig import BotConfig, parse_bot_config
 from BLLInteractor import BLLInteractor
-from bll.dugs.summarize import register_summary_handler
-from bll.dugs.lemmatize import register_lemmatize_handler
-from bll.dugs.stemming import register_stemming_handler
+from langchain.schema import HumanMessage, SystemMessage
+from langchain_community.chat_models.gigachat import GigaChat
+
 
 config = parse_bot_config('config.json')
 bot = telebot.TeleBot(config.telegram_api_token)
@@ -62,7 +62,18 @@ def send_welcome(message):
     if len(message.text) < 17:
         bot.reply_to(message, 'There\'s wrong format of message!')
     else:
-        bot.reply_to(message, api_interactor.translate_text(message.text[11:13], message.text[14:16], message.text[17:]))
+        chat = GigaChat(
+            credentials=config.gigachat_key,
+            verify_ssl_certs=False)
+
+        messages = [SystemMessage(
+            content="Ты бот переводчик, выдавать в сообщении ничего кроме переведенного текста не нужно."
+        ), HumanMessage(content=f"Translate from {message.text[11:13]} to {message.text[14:16]} '{message.text[17:]}'")]
+
+        res = chat(messages)
+
+        bot.reply_to(message, res.content)
+
 
 @bot.message_handler(commands=['censure'])
 def send_welcome(message):
@@ -71,13 +82,25 @@ def send_welcome(message):
     else:
         bot.reply_to(message, api_interactor.censure_text(message.text[9:]))
 
+@bot.message_handler(commands=['summary'])
+def send_welcome(message):
+    chat = GigaChat(
+        credentials=config.gigachat_key,
+        verify_ssl_certs=False)
+
+    messages = [SystemMessage(
+        content=""
+    ), HumanMessage(content=f"summarize this text, try to keep within no more than 3 sentences: {message}")]
+
+    res = chat(messages)
+
+    bot.reply_to(message, res.content)
+
 @bot.message_handler(func=lambda message: True)
 def echo_all(message):
     bot.reply_to(message, "Undefined command!")
 
-register_summary_handler(bot, config.openai_api_key)
-register_lemmatize_handler(bot, config.openai_api_key)
-register_stemming_handler(bot, config.openai_api_key)
+
 
 if __name__ == '__main__':
     bot.polling()

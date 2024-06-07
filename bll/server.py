@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 import requests
 import time
 import nltk
+import ssl
 
 app = Flask(__name__)
 
@@ -77,5 +78,12 @@ def poll_for_result(dag_id, run_id, poll_interval=10, timeout=300):
 
 
 if __name__ == '__main__':
+    try:
+        _create_unverified_https_context = ssl._create_unverified_context
+    except AttributeError:
+        pass
+    else:
+        ssl._create_default_https_context = _create_unverified_https_context
+
     nltk.download('wordnet')
     app.run(host='0.0.0.0', port=8765)

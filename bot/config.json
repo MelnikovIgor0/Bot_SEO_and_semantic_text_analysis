@@ -2,5 +2,5 @@
     "bll_api_url": "http://localhost:8765",
     "debug": false,
     "telegram_api_token": "7026866881:AAGM3UepUOudPmoU8lAuPGLAcPSPH8AXQvI",
-    "openai_api_key": "YOUR_OPENAI_API_KEY"
+    "gigachat_key": "YOUR_GIGACHAT_KEY"
 }

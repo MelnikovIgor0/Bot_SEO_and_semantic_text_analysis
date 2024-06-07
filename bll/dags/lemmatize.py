@@ -7,7 +7,6 @@ import nltk
 def process_message(**context):
     message = context['dag_run'].conf["message"]
     wnl = WordNetLemmatizer()
-    words = message.split(' ')
     result = ''
     i = 0
     while i < len(message):

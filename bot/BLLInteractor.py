@@ -22,36 +22,22 @@ class BLLInteractor:
             return requests.post(self.api_url + '/trigger_dag', params={'message': text, 'dag_id': 'count'}).json()['response']
     
     @catch_error
-    def summarize_text(self, text: str) -> str:
-        if self.debug:
-            return "lorem ipsum"
-        else:
-            return requests.get(self.api_url + '/trigger_dag', params={'message': text, 'dag_id': 'summarize'}).json()['response']
-    
-    @catch_error
     def lemmatize_text(self, text: str) -> str:
         if self.debug:
             return "lorem ipsum"
         else:
-            return requests.get(self.api_url + '/trigger_dag', params={'message': text, 'dag_id': 'lemmatize'}).json()['response']
+            return requests.post(self.api_url + '/trigger_dag', params={'message': text, 'dag_id': 'lemmatize'}).json()['response']
     
     @catch_error
     def stemming_text(self, text: str) -> str:
         if self.debug:
             return "lorem ipsum"
         else:
-            return requests.get(self.api_url + '/trigger_dag', params={'message': text, 'dag_id': 'stemming'}).json()['response']
-    
-    @catch_error
-    def translate_text(self, lang_from: str, lang_to: str, text: str) -> str:
-        if self.debug:
-            return "lorem ipsum"
-        else:
-            return requests.get(self.api_url + '/trigger_dag', params={'lang_from': lang_from, 'lang_to': lang_to, 'message': text, 'dag_id': 'translate'}).json()['response']
-    
+            return requests.post(self.api_url + '/trigger_dag', params={'message': text, 'dag_id': 'stemming'}).json()['response']
+
     @catch_error
     def censure_text(self, text: str) -> str:
         if self.debug:
             return "lorem ipsum"
         else:
-            return requests.get(self.api_url + '/trigger_dag', params={'message': text, 'dag_id': 'censure'}).json()['response']
+            return requests.post(self.api_url + '/trigger_dag', params={'message': text, 'dag_id': 'censure'}).json()['response']
